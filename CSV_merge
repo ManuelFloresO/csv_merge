@@ -1,0 +1,82 @@
+# ==================================================
+# SECCIÓN 1: CONFIGURACIÓN INICIAL
+# ==================================================
+# Define las rutas de la carpeta de origen y el archivo de salida.
+# - $sourceFolder: Ruta de la carpeta que contiene los archivos CSV.
+# - $outputFile: Ruta del archivo CSV de salida combinado.
+# ==================================================
+$sourceFolder = "C:\Users\itanf\checkpassCSV"
+$outputFile = "C:\Users\itanf\checkpassCSV\master_password_audit.csv"
+
+# ==================================================
+# SECCIÓN 2: OBTENER ARCHIVOS CSV
+# ==================================================
+# Obtiene todos los archivos CSV en la carpeta de origen.
+# - Get-ChildItem: Recupera los archivos que coinciden con el filtro *.csv.
+# - -File: Asegura que solo se incluyan archivos (no directorios).
+# - Verifica si hay archivos CSV en la carpeta. Si no hay, muestra un mensaje y termina el script.
+# ==================================================
+$csvFiles = Get-ChildItem -Path $sourceFolder -Filter *.csv -File
+if (-not $csvFiles) {
+    Write-Host "No se encontraron archivos CSV en la ruta especificada."
+    exit
+}
+
+# ==================================================
+# SECCIÓN 3: PROCESAMIENTO DE ARCHIVOS CSV
+# ==================================================
+# Combina los archivos CSV en uno solo, manteniendo los encabezados solo del primer archivo.
+# - StreamReader y StreamWriter: Se utilizan para leer y escribir archivos línea por línea, optimizando el uso de memoria.
+# - $isFirstFile: Bandera para identificar el primer archivo y manejar los encabezados.
+# - try/finally: Garantiza que los recursos (StreamReader y StreamWriter) se cierren correctamente, incluso si ocurre un error.
+# ==================================================
+try {
+    # Abre el archivo de salida para escritura.
+    $outputStream = [System.IO.StreamWriter]::new($outputFile, $false)
+    
+    # Bandera para identificar el primer archivo.
+    $isFirstFile = $true
+
+    # Recorre cada archivo CSV.
+    foreach ($file in $csvFiles) {
+        # Abre el archivo actual para lectura.
+        $inputStream = [System.IO.StreamReader]::new($file.FullName)
+        
+        if ($isFirstFile) {
+            # Si es el primer archivo, escribe todo su contenido (incluyendo encabezados).
+            while (-not $inputStream.EndOfStream) {
+                $outputStream.WriteLine($inputStream.ReadLine())
+            }
+            # Marca que el primer archivo ya fue procesado.
+            $isFirstFile = $false
+        } else {
+            # Si no es el primer archivo, omite las dos primeras líneas (Fecha de Ejecución y Encabezados).
+            $null = $inputStream.ReadLine() # Omite la línea de fecha.
+            $null = $inputStream.ReadLine() # Omite la línea de encabezados.
+            
+            # Escribe el resto del contenido del archivo.
+            while (-not $inputStream.EndOfStream) {
+                $outputStream.WriteLine($inputStream.ReadLine())
+            }
+        }
+        
+        # Cierra y libera los recursos del archivo actual.
+        $inputStream.Close()
+        $inputStream.Dispose()
+    }
+}
+finally {
+    # Asegura que el archivo de salida se cierre correctamente.
+    if ($outputStream) {
+        $outputStream.Close()
+        $outputStream.Dispose()
+    }
+}
+
+# ==================================================
+# SECCIÓN 4: MENSAJE DE FINALIZACIÓN
+# ==================================================
+# Muestra un mensaje indicando que los archivos se han combinado correctamente.
+# - Write-Host: Muestra el mensaje en la consola.
+# ==================================================
+Write-Host "Archivos combinados en: $outputFile"
