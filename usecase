@@ -1,0 +1,125 @@
+### **Nota en GitHub: Resumen del Script de Combinación de Archivos CSV**
+
+---
+
+#### **📌 Resumen del Script**
+
+Este script en PowerShell está diseñado para combinar múltiples archivos CSV en un solo archivo maestro, optimizando el uso de memoria y garantizando que los encabezados no se dupliquen. Es ideal para tareas de auditoría, consolidación de datos y procesamiento de archivos grandes. A continuación, se detallan los elementos clave del script:
+
+---
+
+#### **🔢 Entradas de Datos**
+
+El script requiere las siguientes entradas:
+1. **Carpeta de origen (`$sourceFolder`)**:
+   - Ruta de la carpeta que contiene los archivos CSV que se desean combinar.
+   - Ejemplo: `C:\Users\itanf\checkpassCSV`.
+
+2. **Archivos CSV**:
+   - Archivos con extensión `.csv` ubicados en la carpeta de origen.
+   - Cada archivo debe tener una estructura consistente, incluyendo una línea de fecha y una línea de encabezados.
+
+3. **Archivo de salida (`$outputFile`)**:
+   - Ruta y nombre del archivo CSV combinado.
+   - Ejemplo: `C:\Users\itanf\checkpassCSV\master_password_audit.csv`.
+
+---
+
+#### **🔄 Transformación de Datos**
+
+El script procesa los archivos CSV de la siguiente manera:
+1. **Lectura de archivos**:
+   - Usa `StreamReader` para leer cada archivo línea por línea, optimizando el uso de memoria.
+
+2. **Manejo de encabezados**:
+   - Solo el primer archivo incluye sus encabezados en el archivo combinado.
+   - Los archivos subsiguientes omiten las dos primeras líneas (fecha y encabezados).
+
+3. **Escritura del archivo combinado**:
+   - Usa `StreamWriter` para escribir el contenido en el archivo de salida.
+   - Garantiza que los recursos se liberen correctamente mediante un bloque `try/finally`.
+
+---
+
+#### **🎯 Resultado Final**
+
+Tras la ejecución del script, se obtiene:
+- **Un archivo CSV combinado**:
+  - Contiene los datos de todos los archivos CSV de entrada.
+  - Mantiene los encabezados únicos del primer archivo.
+  - Omite las líneas de fecha y encabezados de los archivos subsiguientes.
+
+- **Mensaje de confirmación**:
+  - Se muestra en la consola la ruta del archivo combinado.
+  - Ejemplo: `Archivos combinados en: C:\Users\itanf\checkpassCSV\master_password_audit.csv`.
+
+---
+
+#### **📊 Diagrama de Flujo de Datos**
+
+```plaintext
++-------------------+       +-------------------+       +-------------------+
+|  Carpeta de Origen |       |  Procesamiento    |       |  Archivo Combinado |
+|  (Archivos CSV)    | ----> |  (StreamReader/   | ----> |  (master_password_ |
+|                   |       |  StreamWriter)    |       |  audit.csv)        |
++-------------------+       +-------------------+       +-------------------+
+```
+
+1. **Entrada**: Archivos CSV en la carpeta de origen.
+2. **Procesamiento**:
+   - Lectura línea por línea.
+   - Manejo de encabezados.
+   - Escritura en el archivo combinado.
+3. **Salida**: Archivo CSV combinado con datos consolidados.
+
+---
+
+#### **📂 Caso de Uso Práctico**
+
+**Contexto**:
+Un equipo de auditoría necesita consolidar múltiples informes de contraseñas en un solo archivo para su análisis. Cada informe es un archivo CSV con la siguiente estructura:
+- Línea 1: Fecha de ejecución.
+- Línea 2: Encabezados.
+- Líneas siguientes: Datos de auditoría.
+
+**Problema**:
+Los informes están dispersos en múltiples archivos CSV, y combinarlos manualmente es tedioso y propenso a errores.
+
+**Solución**:
+El script automatiza la combinación de los archivos CSV, generando un archivo maestro con los datos consolidados y encabezados únicos.
+
+**Ejemplo**:
+- **Archivo1.csv**:
+  ```
+  # Fecha de Ejecución: 2025-02-24 23:21:37
+  Cliente,Servidor,Fecha de Ejecución,Usuario,Días Último Cambio,Fecha Último Cambio,Tipo Cuenta,Requiere Cambio,Fortaleza,Estado,Informe
+  KIO,redhat-vm,24/02/2025 23:21,nobody,819,28/11/2022,Local,Sí,Cumple,rojo,ALERTA: Contraseña expirada (819 días).
+  ```
+
+- **Archivo2.csv**:
+  ```
+  # Fecha de Ejecución: 2025-02-24 23:21:37
+  Cliente,Servidor,Fecha de Ejecución,Usuario,Días Último Cambio,Fecha Último Cambio,Tipo Cuenta,Requiere Cambio,Fortaleza,Estado,Informe
+  KIO,redhat-vm,24/02/2025 23:21,itan_flores,32,23/01/2025,Local,Sí,Cumple,rojo,ALERTA: Contraseña expirada (32 días).
+  ```
+
+- **Archivo combinado (`master_password_audit.csv`)**:
+  ```
+  # Fecha de Ejecución: 2025-02-24 23:21:37
+  Cliente,Servidor,Fecha de Ejecución,Usuario,Días Último Cambio,Fecha Último Cambio,Tipo Cuenta,Requiere Cambio,Fortaleza,Estado,Informe
+  KIO,redhat-vm,24/02/2025 23:21,nobody,819,28/11/2022,Local,Sí,Cumple,rojo,ALERTA: Contraseña expirada (819 días).
+  KIO,redhat-vm,24/02/2025 23:21,itan_flores,32,23/01/2025,Local,Sí,Cumple,rojo,ALERTA: Contraseña expirada (32 días).
+  ```
+
+---
+
+#### **✅ Beneficios del Script**
+
+- **Automatización**: Elimina la necesidad de combinar archivos manualmente.
+- **Eficiencia**: Procesa archivos grandes sin consumir mucha memoria.
+- **Consistencia**: Garantiza que los encabezados no se dupliquen.
+- **Facilidad de uso**: Solo requiere configurar las rutas de entrada y salida.
+
+---
+
+Este resumen proporciona una visión clara y concisa del funcionamiento del script, su aplicación práctica y los beneficios que ofrece. ¡Espero que sea útil para tu repositorio en GitHub! 😊
